@@ -1,0 +1,44 @@
+{
+  "headlesshorseman-1-Crossroads 1": {
+    "boss": "headlesshorseman",
+    "channelChoice": "1",
+    "location": "Crossroads 1",
+    "respawnTime": "2025-10-24T17:15:35.472Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "headlesshorseman-2-Creeping Evil": {
+    "boss": "headlesshorseman",
+    "channelChoice": "2",
+    "location": "Creeping Evil",
+    "respawnTime": "2025-10-24T17:16:05.416Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "headlesshorseman-4-Crossroads 2": {
+    "boss": "headlesshorseman",
+    "channelChoice": "4",
+    "location": "Crossroads 2",
+    "respawnTime": "2025-10-24T17:16:16.925Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "bigfoot-3-Forgotten Path": {
+    "boss": "bigfoot",
+    "channelChoice": "3",
+    "location": "Forgotten Path",
+    "respawnTime": "2025-10-24T17:18:13.438Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "headlesshorseman-4-Twisted Paths 2": {
+    "boss": "headlesshorseman",
+    "channelChoice": "4",
+    "location": "Twisted Paths 2",
+    "respawnTime": "2025-10-24T17:18:30.923Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "headlesshorseman-2-Crossroads 2": {
+    "boss": "headlesshorseman",
+    "channelChoice": "2",
+    "location": "Crossroads 2",
+    "respawnTime": "2025-10-24T17:21:17.722Z",
+    "channelId": "<CHANNEL_ID_2>"
+  }
+}
