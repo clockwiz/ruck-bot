@@ -7,7 +7,7 @@ let bossTimers = new Map();
 
 // Boss-specific locations
 const bossLocations = {
-    bigfoot: ['Forgotten Path','Evil Rising', 'The Evil Dead', 'Twisted Paths 1', 'Twisted Paths 2', 'Twisted Paths 3', 'Twisted Paths 4', 'Twisted Paths 5', ],
+    bigfoot: ['Forgotten Path'],
     headlesshorseman: [
         'Hollowed Ground',
         'Forgotten Path',
@@ -202,41 +202,37 @@ module.exports = {
         }
 
         else if (sub === 'list') {
-            if (bossTimers.size === 0) {
-                await interaction.reply('📭 No boss timers set.');
-                return;
+    const bosses = Object.keys(bossLocations);
+    const channels = ['1', '2', '3', '4'];
+    
+    let msg = '⏰ **Current Boss Timers:**\n';
+
+    for (const boss of bosses) {
+        const locations = bossLocations[boss];
+        for (const location of locations) {
+            for (const channelChoice of channels) {
+                const key = `${boss}-${channelChoice}-${location}`;
+                if (bossTimers.has(key)) {
+                    const info = bossTimers.get(key);
+                    const respawnTime = info.respawnTime;
+                    const now = new Date();
+                    const remainingMs = respawnTime - now;
+                    const hours = Math.floor(remainingMs / 3600000);
+                    const minutes = Math.floor((remainingMs % 3600000) / 60000);
+                    const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
+
+                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
+                } else {
+                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Last killed: Unknown\n`;
+                }
             }
-
-        // Convert Map to array for sorting
-        const timersArray = Array.from(bossTimers.values());
-
-        // Sort by boss name, then location, then channel
-        timersArray.sort((a, b) => {
-            if (a.boss < b.boss) return -1;
-            if (a.boss > b.boss) return 1;
-
-            if (a.location < b.location) return -1;
-            if (a.location > b.location) return 1;
-
-            return parseInt(a.channelChoice) - parseInt(b.channelChoice);
-        });
-
-        let msg = '⏰ **Current Boss Timers:**\n';
-        for (const info of timersArray) {
-            const respawnTime = info.respawnTime;
-            const now = new Date();
-            const remainingMs = respawnTime - now;
-            const hours = Math.floor(remainingMs / 3600000);
-            const minutes = Math.floor((remainingMs % 3600000) / 60000);
-
-            const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
-
-            msg += `• **${info.boss}** — Location: ${info.location} — Channel: ${info.channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
         }
-
-        await interaction.reply(msg);
     }
+
+    await interaction.reply(msg);
+}
+
     },
 
     init(client) {
