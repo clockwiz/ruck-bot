@@ -40,5 +40,173 @@
     "location": "Crossroads 2",
     "respawnTime": "2025-10-24T17:21:17.722Z",
     "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-3-Hidden Evil": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "Hidden Evil",
+    "respawnTime": "2025-10-24T22:53:10.137Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-1-CR1": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "CR1",
+    "respawnTime": "2025-10-24T17:15:00.000Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-2-CR1": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "CR1",
+    "respawnTime": "2025-10-24T17:25:00.000Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-3-CR1": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "CR1",
+    "respawnTime": "2025-10-24T17:33:00.000Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-4-CR1": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "CR1",
+    "respawnTime": "2025-10-24T21:56:13.162Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-1-CR2": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "CR2",
+    "respawnTime": "2025-10-24T22:45:00.000Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-2-CR2": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "CR2",
+    "respawnTime": "2025-10-24T22:38:00.000Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-3-CR2": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "CR2",
+    "respawnTime": "2025-10-24T22:41:00.000Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-4-CR2": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "CR2",
+    "respawnTime": "2025-10-24T22:51:00.000Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-2-CR3": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "CR3",
+    "respawnTime": "2025-10-24T22:04:00.000Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-1-Creeping Evil": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "Creeping Evil",
+    "respawnTime": "2025-10-24T23:31:47.394Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-2-Creeping Evil": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "Creeping Evil",
+    "respawnTime": "2025-10-24T23:32:35.783Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-3-Creeping Evil": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "Creeping Evil",
+    "respawnTime": "2025-10-24T23:32:53.978Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-4-Creeping Evil": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "Creeping Evil",
+    "respawnTime": "2025-10-24T23:33:27.926Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-3-CR3": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "CR3",
+    "respawnTime": "2025-10-23T22:04:00.000Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-4-Forgotten Path": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "Forgotten Path",
+    "respawnTime": "2025-10-24T22:38:28.638Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-1-CR3": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "CR3",
+    "respawnTime": "2025-10-24T22:38:40.323Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-4-Hollowed": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "Hollowed",
+    "respawnTime": "2025-10-24T22:40:31.579Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-1-Hollowed": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "Hollowed",
+    "respawnTime": "2025-10-24T22:40:35.218Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-2-Hollowed": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "Hollowed",
+    "respawnTime": "2025-10-24T22:42:18.957Z",
+    "channelId": "<CHANNEL_ID_2>"
+  },
+  "HH-3-Hollowed": {
+    "boss": "HH",
+    "channelChoice": "3",
+    "location": "Hollowed",
+    "respawnTime": "2025-10-24T22:44:35.753Z",
+    "channelId": "<CHANNEL_ID_3>"
+  },
+  "HH-4-Hidden Evil": {
+    "boss": "HH",
+    "channelChoice": "4",
+    "location": "Hidden Evil",
+    "respawnTime": "2025-10-24T22:51:21.946Z",
+    "channelId": "<CHANNEL_ID_4>"
+  },
+  "HH-1-Hidden Evil": {
+    "boss": "HH",
+    "channelChoice": "1",
+    "location": "Hidden Evil",
+    "respawnTime": "2025-10-24T22:51:25.202Z",
+    "channelId": "<CHANNEL_ID_1>"
+  },
+  "HH-2-Hidden Evil": {
+    "boss": "HH",
+    "channelChoice": "2",
+    "location": "Hidden Evil",
+    "respawnTime": "2025-10-24T22:51:28.428Z",
+    "channelId": "<CHANNEL_ID_2>"
   }
 }

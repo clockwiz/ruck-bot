@@ -2,16 +2,27 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
 
-// Read your token from the Render secret file
-// Make sure you added a Secret File in Render named config.json
-const configPath = '/etc/secrets/config.json';
 let token;
 
+// Try Render secret file first
+const renderConfigPath = '/etc/secrets/config.json';
+// Fallback to local config.json in project root
+const localConfigPath = path.join(__dirname, 'config.json');
+
 try {
-    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    token = config.token;
+    if (fs.existsSync(renderConfigPath)) {
+        const config = JSON.parse(fs.readFileSync(renderConfigPath, 'utf8'));
+        token = config.token;
+        console.log('✅ Using token from Render secret file.');
+    } else if (fs.existsSync(localConfigPath)) {
+        const config = JSON.parse(fs.readFileSync(localConfigPath, 'utf8'));
+        token = config.token;
+        console.log('✅ Using token from local config.json.');
+    } else {
+        throw new Error('No config file found.');
+    }
 } catch (err) {
-    console.error('Failed to read token from config.json. Make sure the secret file exists on Render.');
+    console.error('Failed to read token. Make sure the config file exists locally or on Render.', err);
     process.exit(1);
 }
 

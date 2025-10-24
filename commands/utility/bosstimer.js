@@ -13,7 +13,6 @@ const bossLocations = {
         'Forgotten Path',
         'Hidden Evil',
         'Creeping Evil',
-        'The Evil Dead',
         'CR1',
         'CR2',
         'CR3'
@@ -112,8 +111,8 @@ module.exports = {
                 )
                 .addStringOption(opt =>
                     opt
-                        .setName('time')
-                        .setDescription('Defaults to current time. Otherwise type in HH:MM format')
+                        .setName('datetime')
+                        .setDescription('Optional: Specify date and time as MM/DD HH:MM. Defaults to now.')
                         .setRequired(false)
                 )
         )
@@ -163,14 +162,22 @@ module.exports = {
             if (!channelId) return interaction.reply('⚠️ Invalid channel selection.');
 
             const location = interaction.options.getString('location');
-
             let now = new Date();
-            const timeInput = interaction.options.getString('time');
+            const timeInput = interaction.options.getString('datetime'); // fixed here
+
             if (timeInput) {
-                const [hours, minutes] = timeInput.split(':').map(Number);
-                if (!Number.isInteger(hours) || !Number.isInteger(minutes))
-                    return interaction.reply('⚠️ Invalid time format. Use HH:MM (24h).');
-                now.setHours(hours, minutes, 0, 0);
+                // Split into MM/DD and HH:MM
+                const [datePart, timePart] = timeInput.split(' ');
+                if (!datePart || !timePart) return interaction.reply('⚠️ Invalid format. Use MM/DD HH:MM');
+
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+
+                if (![month, day, hours, minutes].every(Number.isInteger))
+                    return interaction.reply('⚠️ Invalid format. Use MM/DD HH:MM');
+
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes, 0, 0);
             }
 
             const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000);
@@ -181,7 +188,7 @@ module.exports = {
             scheduleReminder(interaction.client, boss, respawn, channelId);
 
             await interaction.reply(
-                `✅ Timer set for **${boss}** in channel ${channelChoice} at location **${location}** — respawns at **${respawn.toLocaleTimeString()}**`
+                `✅ Timer set for **${boss}** in channel ${channelChoice} at location **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t>`
             );
         } else if (sub === 'delete') {
             const boss = interaction.options.getString('boss');
@@ -212,16 +219,17 @@ module.exports = {
                         if (bossTimers.has(key)) {
                             const info = bossTimers.get(key);
                             const respawnTime = info.respawnTime;
-                            const now = new Date();
-                            const remainingMs = respawnTime - now;
+
+                            const now = new Date(); // bot current time in UTC
+                            const remainingMs = info.respawnTime.getTime() - now.getTime(); 
                             const hours = Math.floor(remainingMs / 3600000);
                             const minutes = Math.floor((remainingMs % 3600000) / 60000);
-                            const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
+                            const remainingStr = remainingMs > 0 ? `(${hours}h ${minutes}m)` : '(Expired)';
+                            const timestamp = Math.floor(respawnTime.getTime() / 1000);
 
-                            msg += `• **${bossDisplayNames[boss]}** — ${location} — Channel ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
+                            msg += `• **${bossDisplayNames[boss]}** — ${location} — cc ${channelChoice} — spawns <t:${timestamp}:t> ${remainingStr}\n`;
                         } else {
-                            msg += `• **${bossDisplayNames[boss]}** — ${location} — Channel ${channelChoice} — Unknown\n`;
+                            msg += `• **${bossDisplayNames[boss]}** — ${location} — cc ${channelChoice} — NIL\n`;
                         }
                     }
                 }
