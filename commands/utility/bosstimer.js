@@ -202,42 +202,45 @@ module.exports = {
         }
 
         else if (sub === 'list') {
-            // Build the message
-            const bosses = Object.keys(bossLocations);
-            const channels = ['1', '2', '3', '4'];
-            
-            let msg = '⏰ **Current Boss Timers:**\n';
+    await interaction.deferReply(); // Give yourself extra time
 
-            for (const boss of bosses) {
-                const locations = bossLocations[boss];
-                for (const location of locations) {
-                    for (const channelChoice of channels) {
-                        const key = `${boss}-${channelChoice}-${location}`;
-                        if (bossTimers.has(key)) {
-                            const info = bossTimers.get(key);
-                            const respawnTime = info.respawnTime;
-                            const now = new Date();
-                            const remainingMs = respawnTime - now;
-                            const hours = Math.floor(remainingMs / 3600000);
-                            const minutes = Math.floor((remainingMs % 3600000) / 60000);
-                            const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                            const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
+    const bosses = Object.keys(bossLocations);
+    const channels = ['1', '2', '3', '4'];
 
-                            msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
-                        } else {
-                            msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Last killed: Unknown\n`;
-                        }
-                    }
+    let msg = '⏰ **Current Boss Timers:**\n';
+
+    for (const boss of bosses) {
+        const locations = bossLocations[boss];
+        for (const location of locations) {
+            for (const channelChoice of channels) {
+                const key = `${boss}-${channelChoice}-${location}`;
+                if (bossTimers.has(key)) {
+                    const info = bossTimers.get(key);
+                    const respawnTime = info.respawnTime;
+                    const now = new Date();
+                    const remainingMs = respawnTime - now;
+                    const hours = Math.floor(remainingMs / 3600000);
+                    const minutes = Math.floor((remainingMs % 3600000) / 60000);
+                    const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
+
+                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
+                } else {
+                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Last killed: Unknown\n`;
                 }
             }
-
-            // Truncate if too long
-            if (msg.length > 2000) {
-                msg = msg.substring(0, 1990) + '\n...';
-            }
-
-            await interaction.reply(msg);
         }
+    }
+
+    // Truncate if too long
+    if (msg.length > 2000) {
+        msg = msg.substring(0, 1990) + '\n...';
+    }
+
+    // Use followUp after deferring
+    await interaction.followUp(msg);
+}
+
     },
 
     init(client) {
