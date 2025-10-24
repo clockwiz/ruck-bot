@@ -7,8 +7,8 @@ let bossTimers = new Map();
 
 // Boss-specific locations
 const bossLocations = {
-    bigfoot: ['Forgotten Path'],
-    headlesshorseman: [
+    BF: ['Forgotten Path'],
+    HH: [
         'Hollowed',
         'Forgotten Path',
         'Hidden Evil',
@@ -84,7 +84,7 @@ module.exports = {
                         .setRequired(true)
                         .addChoices(
                             { name: 'Big Foot', value: 'bigfoot' },
-                            { name: 'Headless Horseman', value: 'headlesshorseman' }
+                            { name: 'Headless Horseman', value: 'HH' }
                         )
                 )
                 .addStringOption(opt =>
@@ -107,7 +107,7 @@ module.exports = {
                         .addChoices(
                             ...[].concat(
                                 bossLocations.bigfoot.map(loc => ({ name: loc, value: loc })),
-                                bossLocations.headlesshorseman.map(loc => ({ name: loc, value: loc }))
+                                bossLocations.HH.map(loc => ({ name: loc, value: loc }))
                             )
                         )
                 )
