@@ -202,6 +202,8 @@ module.exports = {
         }
 
         else if (sub === 'list') {
+    await interaction.deferReply(); // Give yourself extra time
+
     const bosses = Object.keys(bossLocations);
     const channels = ['1', '2', '3', '4'];
     
@@ -230,8 +232,13 @@ module.exports = {
         }
     }
 
-    await interaction.reply(msg);
+    // Split message if longer than 2000 chars
+    const chunks = msg.match(/[\s\S]{1,2000}/g) || [];
+    for (const chunk of chunks) {
+        await interaction.followUp(chunk);
+    }
 }
+
 
     },
 
