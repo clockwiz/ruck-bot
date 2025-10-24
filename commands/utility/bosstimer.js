@@ -9,14 +9,14 @@ let bossTimers = new Map();
 const bossLocations = {
     bigfoot: ['Forgotten Path'],
     headlesshorseman: [
-        'Hollowed Ground',
+        'Hollowed',
         'Forgotten Path',
         'Hidden Evil',
         'Creeping Evil',
         'The Evil Dead',
-        'Crossroads 1',
-        'Crossroads 2',
-        'Crossroads 3'
+        'CR1',
+        'CR2',
+        'CR3'
     ]
 };
 
@@ -224,9 +224,9 @@ module.exports = {
                     const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
 
-                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
+                    msg += `• **${boss}** —  ${location} — Channel ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
                 } else {
-                    msg += `• **${boss}** — Location: ${location} — Channel: ${channelChoice} — Last killed: Unknown\n`;
+                    msg += `• **${boss}** —  ${location} — Channel ${channelChoice} — Unknown\n`;
                 }
             }
         }
