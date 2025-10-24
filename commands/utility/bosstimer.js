@@ -55,7 +55,6 @@ function scheduleReminder(client, boss, respawnTime, channelId) {
             if (channel) {
                 await channel.send(`⚔️ **${boss}** has respawned!`);
             }
-            // Remove the specific key
             for (const [key, info] of bossTimers.entries()) {
                 if (info.boss === boss && info.channelId === channelId && info.respawnTime.getTime() === respawnTime.getTime()) {
                     bossTimers.delete(key);
@@ -83,7 +82,7 @@ module.exports = {
                         .setDescription('Select the boss')
                         .setRequired(true)
                         .addChoices(
-                            { name: 'Big Foot', value: 'bigfoot' },
+                            { name: 'Big Foot', value: 'BF' },
                             { name: 'Headless Horseman', value: 'HH' }
                         )
                 )
@@ -106,7 +105,7 @@ module.exports = {
                         .setRequired(true)
                         .addChoices(
                             ...[].concat(
-                                bossLocations.bigfoot.map(loc => ({ name: loc, value: loc })),
+                                bossLocations.BF.map(loc => ({ name: loc, value: loc })),
                                 bossLocations.HH.map(loc => ({ name: loc, value: loc }))
                             )
                         )
@@ -165,9 +164,8 @@ module.exports = {
 
             const location = interaction.options.getString('location');
 
-            // Optional time
-            const timeInput = interaction.options.getString('time');
             let now = new Date();
+            const timeInput = interaction.options.getString('time');
             if (timeInput) {
                 const [hours, minutes] = timeInput.split(':').map(Number);
                 if (!Number.isInteger(hours) || !Number.isInteger(minutes))
@@ -185,9 +183,7 @@ module.exports = {
             await interaction.reply(
                 `✅ Timer set for **${boss}** in channel ${channelChoice} at location **${location}** — respawns at **${respawn.toLocaleTimeString()}**`
             );
-        }
-
-        else if (sub === 'delete') {
+        } else if (sub === 'delete') {
             const boss = interaction.options.getString('boss');
             const channelChoice = interaction.options.getString('channel');
             const location = interaction.options.getString('location');
@@ -199,48 +195,44 @@ module.exports = {
             bossTimers.delete(key);
             saveTimers();
             await interaction.reply(`🗑️ Deleted timer for **${boss}** in channel ${channelChoice} at location ${location}.`);
-        }
+        } else if (sub === 'list') {
+            await interaction.deferReply();
 
-        else if (sub === 'list') {
-    await interaction.deferReply(); // Give yourself extra time
+            const bossDisplayNames = { BF: 'BF', HH: 'HH' };
+            const bosses = Object.keys(bossLocations);
+            const channels = ['1', '2', '3', '4'];
 
-    const bosses = Object.keys(bossLocations);
-    const channels = ['1', '2', '3', '4'];
+            let msg = '⏰ **Current Boss Timers:**\n';
 
-    let msg = '⏰ **Current Boss Timers:**\n';
+            for (const boss of bosses) {
+                const locations = bossLocations[boss];
+                for (const location of locations) {
+                    for (const channelChoice of channels) {
+                        const key = `${boss}-${channelChoice}-${location}`;
+                        if (bossTimers.has(key)) {
+                            const info = bossTimers.get(key);
+                            const respawnTime = info.respawnTime;
+                            const now = new Date();
+                            const remainingMs = respawnTime - now;
+                            const hours = Math.floor(remainingMs / 3600000);
+                            const minutes = Math.floor((remainingMs % 3600000) / 60000);
+                            const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
 
-    for (const boss of bosses) {
-        const locations = bossLocations[boss];
-        for (const location of locations) {
-            for (const channelChoice of channels) {
-                const key = `${boss}-${channelChoice}-${location}`;
-                if (bossTimers.has(key)) {
-                    const info = bossTimers.get(key);
-                    const respawnTime = info.respawnTime;
-                    const now = new Date();
-                    const remainingMs = respawnTime - now;
-                    const hours = Math.floor(remainingMs / 3600000);
-                    const minutes = Math.floor((remainingMs % 3600000) / 60000);
-                    const timeStr = respawnTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const remainingStr = remainingMs > 0 ? ` (${hours}h ${minutes}m remaining)` : ' (Expired)';
-
-                    msg += `• **${boss}** —  ${location} — Channel ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
-                } else {
-                    msg += `• **${boss}** —  ${location} — Channel ${channelChoice} — Unknown\n`;
+                            msg += `• **${bossDisplayNames[boss]}** — ${location} — Channel ${channelChoice} — Respawns at **${timeStr}**${remainingStr}\n`;
+                        } else {
+                            msg += `• **${bossDisplayNames[boss]}** — ${location} — Channel ${channelChoice} — Unknown\n`;
+                        }
+                    }
                 }
             }
+
+            if (msg.length > 2000) {
+                msg = msg.substring(0, 1990) + '\n...';
+            }
+
+            await interaction.followUp(msg);
         }
-    }
-
-    // Truncate if too long
-    if (msg.length > 2000) {
-        msg = msg.substring(0, 1990) + '\n...';
-    }
-
-    // Use followUp after deferring
-    await interaction.followUp(msg);
-}
-
     },
 
     init(client) {
