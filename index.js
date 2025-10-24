@@ -2,12 +2,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
 
-// Read your token from the secret config file Render provides
-// Make sure the file is added as a "Secret File" in Render
-const configPath = path.join(__dirname, 'config.json');
+// Read your token from the Render secret file
+// Make sure you added a Secret File in Render named config.json
+const configPath = '/etc/secrets/config.json';
 let token;
+
 try {
-    token = JSON.parse(fs.readFileSync(configPath, 'utf8')).token;
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    token = config.token;
 } catch (err) {
     console.error('Failed to read token from config.json. Make sure the secret file exists on Render.');
     process.exit(1);
