@@ -35,42 +35,20 @@ function loadTimers() {
             for (const [key, info] of Object.entries(data)) {
                 bossTimers.set(key, { ...info, respawnTime: new Date(info.respawnTime) });
             }
-            console.log('✅ Boss timers loaded from file.');
+            console.log('Boss timers loaded from file.');
         }
     } catch (err) {
-        console.error('⚠️ Failed to load boss timers:', err);
+        console.error('Failed to load boss timers:', err);
     }
 }
 
+// Save timers to file
 function saveTimers() {
     const obj = {};
     for (const [key, info] of bossTimers.entries()) {
         obj[key] = { ...info, respawnTime: info.respawnTime.toISOString() };
     }
     fs.writeFileSync(filePath, JSON.stringify(obj, null, 2));
-}
-
-function scheduleReminder(client, boss, respawnTime, channelId) {
-    const delay = respawnTime.getTime() - Date.now();
-    if (delay <= 0) return;
-
-    setTimeout(async () => {
-        try {
-            const channel = await client.channels.fetch(channelId);
-            if (channel) {
-                await channel.send(`⚔️ **${boss}** has respawned!`);
-            }
-            for (const [key, info] of bossTimers.entries()) {
-                if (info.boss === boss && info.channelId === channelId && info.respawnTime.getTime() === respawnTime.getTime()) {
-                    bossTimers.delete(key);
-                    break;
-                }
-            }
-            saveTimers();
-        } catch (err) {
-            console.error(`Failed to send reminder for ${boss}:`, err);
-        }
-    }, delay);
 }
 
 module.exports = {
@@ -198,19 +176,10 @@ module.exports = {
     async execute(interaction) {
         const sub = interaction.options.getSubcommand();
 
-        // Map channels
-        const channelMap = {
-            '1': '<CHANNEL_ID_1>',
-            '2': '<CHANNEL_ID_2>',
-            '3': '<CHANNEL_ID_3>',
-            '4': '<CHANNEL_ID_4>'
-        };
-
         // ADD-BF
         if (sub === 'add-bf') {
             const boss = 'BF';
             const channelChoice = interaction.options.getString('channel');
-            const channelId = channelMap[channelChoice];
             const location = interaction.options.getString('location');
             let now = new Date();
 
@@ -223,15 +192,14 @@ module.exports = {
                 now = new Date(year, month - 1, day, hours, minutes);
             }
 
-            const respawn = new Date(now.getTime() + 12 * 60 * 60 * 1000); // ⏰ 12 hours
+            const respawn = new Date(now.getTime() + 12 * 60 * 60 * 1000);
             const key = `${boss}-${channelChoice}-${location}`;
-            bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn, channelId });
+            bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn });
 
             saveTimers();
-            scheduleReminder(interaction.client, boss, respawn, channelId);
 
             await interaction.reply(
-                `✅ BF timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t>`
+                `✅ BF timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
             );
         }
 
@@ -239,7 +207,6 @@ module.exports = {
         else if (sub === 'add-hh') {
             const boss = 'HH';
             const channelChoice = interaction.options.getString('channel');
-            const channelId = channelMap[channelChoice];
             const location = interaction.options.getString('location');
             let now = new Date();
 
@@ -252,15 +219,14 @@ module.exports = {
                 now = new Date(year, month - 1, day, hours, minutes);
             }
 
-            const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000); // ⏰ 6 hours
+            const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000);
             const key = `${boss}-${channelChoice}-${location}`;
-            bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn, channelId });
+            bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn });
 
             saveTimers();
-            scheduleReminder(interaction.client, boss, respawn, channelId);
 
             await interaction.reply(
-                `✅ HH timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t>`
+                `✅ HH timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
             );
         }
 
@@ -307,9 +273,5 @@ module.exports = {
 
     init(client) {
         loadTimers();
-        for (const [, info] of bossTimers.entries()) {
-            scheduleReminder(client, info.boss, info.respawnTime, info.channelId);
-        }
-        console.log('⏲️ Scheduled boss reminders restored.');
     }
 };
