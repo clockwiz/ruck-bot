@@ -8,8 +8,9 @@ let bossTimers = new Map();
 // Boss-specific locations
 const bossLocations = {
     BF: [
-        'Forgotten Path',
-        'The Evil Dead',
+        'F Path',
+        'Evil Dead',
+        'Evil Rising',
         'TP1',
         'TP2',
         'TP3',
