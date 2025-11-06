@@ -8,23 +8,23 @@ let bossTimers = new Map();
 // Boss-specific locations
 const bossLocations = {
     BF: [
-        'F Path',
-        'Evil Dead',
-        'Evil Rising',
-        'TP1',
-        'TP2',
-        'TP3',
-        'TP4',
-        'TP5'
+        { input: 'Forgotten Path', display: 'F Path' },
+        { input: 'Evil Dead', display: 'Evil Dead' },
+        { input: 'Evil Rising', display: 'Evil Rising' },
+        { input: 'TP1', display: 'TP1' },
+        { input: 'TP2', display: 'TP2' },
+        { input: 'TP3', display: 'TP3' },
+        { input: 'TP4', display: 'TP4' },
+        { input: 'TP5', display: 'TP5' }
     ],
     HH: [
-        'Hollowed',
-        'Forgotten Path',
-        'Hidden Evil',
-        'Creeping Evil',
-        'CR1',
-        'CR2',
-        'CR3'
+        { input: 'Hollowed', display: 'Hollowed' },
+        { input: 'Forgotten Path', display: 'Forgotten Path' },
+        { input: 'Hidden Evil', display: 'Hidden Evil' },
+        { input: 'Creeping Evil', display: 'Creeping Evil' },
+        { input: 'CR1', display: 'CR1' },
+        { input: 'CR2', display: 'CR2' },
+        { input: 'CR3', display: 'CR3' }
     ]
 };
 
@@ -80,7 +80,7 @@ module.exports = {
                         .setDescription('Select the Big Foot location')
                         .setRequired(true)
                         .addChoices(
-                            ...bossLocations.BF.map(loc => ({ name: loc, value: loc }))
+                            ...bossLocations.BF.map(loc => ({ name: loc.input, value: loc.input }))
                         )
                 )
                 .addStringOption(opt =>
@@ -114,7 +114,7 @@ module.exports = {
                         .setDescription('Select the HH location')
                         .setRequired(true)
                         .addChoices(
-                            ...bossLocations.HH.map(loc => ({ name: loc, value: loc }))
+                            ...bossLocations.HH.map(loc => ({ name: loc.input, value: loc.input }))
                         )
                 )
                 .addStringOption(opt =>
@@ -253,16 +253,18 @@ module.exports = {
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
 
-            for (const location of bossLocations[boss]) {
+            for (const loc of bossLocations[boss]) {
+                const locationInput = loc.input;
+                const locationDisplay = loc.display;
+
                 for (const channelChoice of channels) {
-                    const key = `${boss}-${channelChoice}-${location}`;
+                    const key = `${boss}-${channelChoice}-${locationInput}`;
                     if (bossTimers.has(key)) {
                         const info = bossTimers.get(key);
                         const timestamp = Math.floor(info.respawnTime.getTime() / 1000);
-
-                        msg += `• **${location}** — cc${channelChoice} — spawns <t:${timestamp}:t> (<t:${timestamp}:R>)\n`;
+                        msg += `• **${locationDisplay}** — cc${channelChoice} — spawns <t:${timestamp}:t> (<t:${timestamp}:R>)\n`;
                     } else {
-                        msg += `• **${location}** — cc${channelChoice} — NIL\n`;
+                        msg += `• **${locationDisplay}** — cc${channelChoice} — NIL\n`;
                     }
                 }
             }
