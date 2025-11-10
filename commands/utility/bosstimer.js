@@ -251,21 +251,58 @@ module.exports = {
             const bossDisplay = boss === 'BF' ? 'Big Foot' : 'Headless Horseman';
             const channels = ['1', '2', '3', '4'];
 
-            let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
+            const timers = [];
 
+            // Gather all timers
             for (const loc of bossLocations[boss]) {
                 const locationInput = loc.input;
                 const locationDisplay = loc.display;
-
                 for (const channelChoice of channels) {
                     const key = `${boss}-${channelChoice}-${locationInput}`;
                     if (bossTimers.has(key)) {
-                        const info = bossTimers.get(key);
-                        const timestamp = Math.floor(info.respawnTime.getTime() / 1000);
-                        msg += `• **${locationDisplay}** — cc${channelChoice} — spawns <t:${timestamp}:t> (<t:${timestamp}:R>)\n`;
+                        timers.push({
+                            locationDisplay,
+                            channelChoice,
+                            respawnTime: bossTimers.get(key).respawnTime
+                        });
                     } else {
-                        msg += `• **${locationDisplay}** — cc${channelChoice} — NIL\n`;
+                        timers.push({
+                            locationDisplay,
+                            channelChoice,
+                            respawnTime: null
+                        });
                     }
+                }
+            }
+
+            // Sort timers
+            const now = new Date();
+            timers.sort((a, b) => {
+                // NIL first
+                if (!a.respawnTime) return -1;
+                if (!b.respawnTime) return 1;
+
+                const aDiff = a.respawnTime - now;
+                const bDiff = b.respawnTime - now;
+
+                // Future timers: longest remaining first
+                if (aDiff > 0 && bDiff > 0) return bDiff - aDiff;
+
+                // Past timers: oldest expired first
+                if (aDiff <= 0 && bDiff <= 0) return aDiff - bDiff;
+
+                // Mix of past/future: future before past
+                return aDiff > 0 ? -1 : 1;
+            });
+
+            // Build message
+            let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
+            for (const t of timers) {
+                if (!t.respawnTime) {
+                    msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — NIL\n`;
+                } else {
+                    const ts = Math.floor(t.respawnTime.getTime() / 1000);
+                    msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
                 }
             }
 
