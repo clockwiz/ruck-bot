@@ -325,8 +325,11 @@ module.exports = {
 
             const now = new Date();
             timers.sort((a, b) => {
-                if (!a.respawnTime) return -1;
-                if (!b.respawnTime) return 1;
+                // NILs first
+                if (!a.respawnTime && b.respawnTime) return -1;
+                if (a.respawnTime && !b.respawnTime) return 1;
+                if (!a.respawnTime && !b.respawnTime) return 0;
+                // Then sort ascending
                 return a.respawnTime - b.respawnTime;
             });
 
