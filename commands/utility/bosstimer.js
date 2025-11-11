@@ -25,7 +25,8 @@ const bossLocations = {
         { input: 'CR1', display: 'CR1' },
         { input: 'CR2', display: 'CR2' },
         { input: 'CR3', display: 'CR3' }
-    ]
+    ],
+    AHMA: [] // No location needed
 };
 
 // Load timers from file
@@ -125,6 +126,31 @@ module.exports = {
                 )
         )
 
+        // 👵 ADD-AHMA
+        .addSubcommand(sub =>
+            sub
+                .setName('add-ahma')
+                .setDescription('Add an Ah Ma timer.')
+                .addStringOption(opt =>
+                    opt
+                        .setName('channel')
+                        .setDescription('Select which channel (1-4)')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1', value: '1' },
+                            { name: '2', value: '2' },
+                            { name: '3', value: '3' },
+                            { name: '4', value: '4' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt
+                        .setName('datetime')
+                        .setDescription('Optional: Specify date/time as MM/DD HH:MM')
+                        .setRequired(false)
+                )
+        )
+
         // 🗑 DELETE
         .addSubcommand(sub =>
             sub
@@ -134,7 +160,8 @@ module.exports = {
                     opt.setName('boss').setDescription('Boss name').setRequired(true)
                         .addChoices(
                             { name: 'Big Foot', value: 'BF' },
-                            { name: 'Headless Horseman', value: 'HH' }
+                            { name: 'Headless Horseman', value: 'HH' },
+                            { name: 'Ah Ma', value: 'AHMA' }
                         )
                 )
                 .addStringOption(opt =>
@@ -152,8 +179,8 @@ module.exports = {
                 .addStringOption(opt =>
                     opt
                         .setName('location')
-                        .setDescription('Location of the boss to delete')
-                        .setRequired(true)
+                        .setDescription('Location of the boss to delete (for BF/HH only)')
+                        .setRequired(false)
                 )
         )
 
@@ -165,11 +192,12 @@ module.exports = {
                 .addStringOption(opt =>
                     opt
                         .setName('boss')
-                        .setDescription('Which boss to show (BF or HH)')
+                        .setDescription('Which boss to show')
                         .setRequired(true)
                         .addChoices(
                             { name: 'Big Foot', value: 'BF' },
-                            { name: 'Headless Horseman', value: 'HH' }
+                            { name: 'Headless Horseman', value: 'HH' },
+                            { name: 'Ah Ma', value: 'AHMA' }
                         )
                 )
         ),
@@ -196,12 +224,9 @@ module.exports = {
             const respawn = new Date(now.getTime() + 12 * 60 * 60 * 1000);
             const key = `${boss}-${channelChoice}-${location}`;
             bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn });
-
             saveTimers();
 
-            await interaction.reply(
-                `✅ BF timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
-            );
+            await interaction.reply(`✅ BF timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`);
         }
 
         // ADD-HH
@@ -223,12 +248,32 @@ module.exports = {
             const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000);
             const key = `${boss}-${channelChoice}-${location}`;
             bossTimers.set(key, { boss, channelChoice, location, respawnTime: respawn });
-
             saveTimers();
 
-            await interaction.reply(
-                `✅ HH timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
-            );
+            await interaction.reply(`✅ HH timer set in cc${channelChoice} at **${location}** — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`);
+        }
+
+        // ADD-AHMA
+        else if (sub === 'add-ahma') {
+            const boss = 'AHMA';
+            const channelChoice = interaction.options.getString('channel');
+            let now = new Date();
+
+            const timeInput = interaction.options.getString('datetime');
+            if (timeInput) {
+                const [datePart, timePart] = timeInput.split(' ');
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000); // 6 hours
+            const key = `${boss}-${channelChoice}`;
+            bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
+            saveTimers();
+
+            await interaction.reply(`✅ Ah Ma timer set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`);
         }
 
         // DELETE
@@ -236,73 +281,60 @@ module.exports = {
             const boss = interaction.options.getString('boss');
             const channelChoice = interaction.options.getString('channel');
             const location = interaction.options.getString('location');
-            const key = `${boss}-${channelChoice}-${location}`;
+            const key = boss === 'AHMA' ? `${boss}-${channelChoice}` : `${boss}-${channelChoice}-${location}`;
             if (!bossTimers.has(key))
-                return interaction.reply(`⚠️ No timer found for **${boss}** in cc${channelChoice} at ${location}.`);
+                return interaction.reply(`⚠️ No timer found for **${boss}** in cc${channelChoice}${location ? ` at ${location}` : ''}.`);
             bossTimers.delete(key);
             saveTimers();
-            await interaction.reply(`🗑️ Deleted timer for **${boss}** in cc${channelChoice} at ${location}.`);
+            await interaction.reply(`🗑️ Deleted timer for **${boss}** in cc${channelChoice}${location ? ` at ${location}` : ''}.`);
         }
 
         // LIST
         else if (sub === 'list') {
             await interaction.deferReply();
             const boss = interaction.options.getString('boss');
-            const bossDisplay = boss === 'BF' ? 'Big Foot' : 'Headless Horseman';
+            const bossDisplay = boss === 'BF' ? 'Big Foot' : boss === 'HH' ? 'Headless Horseman' : 'Ah Ma';
             const channels = ['1', '2', '3', '4'];
-
             const timers = [];
 
-            // Gather all timers
-            for (const loc of bossLocations[boss]) {
-                const locationInput = loc.input;
-                const locationDisplay = loc.display;
+            if (boss === 'AHMA') {
                 for (const channelChoice of channels) {
-                    const key = `${boss}-${channelChoice}-${locationInput}`;
+                    const key = `${boss}-${channelChoice}`;
                     if (bossTimers.has(key)) {
-                        timers.push({
-                            locationDisplay,
-                            channelChoice,
-                            respawnTime: bossTimers.get(key).respawnTime
-                        });
+                        timers.push({ channelChoice, respawnTime: bossTimers.get(key).respawnTime });
                     } else {
-                        timers.push({
-                            locationDisplay,
-                            channelChoice,
-                            respawnTime: null
-                        });
+                        timers.push({ channelChoice, respawnTime: null });
+                    }
+                }
+            } else {
+                for (const loc of bossLocations[boss]) {
+                    const locationInput = loc.input;
+                    const locationDisplay = loc.display;
+                    for (const channelChoice of channels) {
+                        const key = `${boss}-${channelChoice}-${locationInput}`;
+                        if (bossTimers.has(key)) {
+                            timers.push({ locationDisplay, channelChoice, respawnTime: bossTimers.get(key).respawnTime });
+                        } else {
+                            timers.push({ locationDisplay, channelChoice, respawnTime: null });
+                        }
                     }
                 }
             }
 
-            // Sort timers
             const now = new Date();
             timers.sort((a, b) => {
-                // NIL first
                 if (!a.respawnTime) return -1;
                 if (!b.respawnTime) return 1;
-
-                const aDiff = a.respawnTime - now;
-                const bDiff = b.respawnTime - now;
-
-                // Future timers: longest remaining first
-                if (aDiff > 0 && bDiff > 0) return bDiff - aDiff;
-
-                // Past timers: oldest expired first
-                if (aDiff <= 0 && bDiff <= 0) return aDiff - bDiff;
-
-                // Mix of past/future: future before past
-                return aDiff > 0 ? -1 : 1;
+                return a.respawnTime - b.respawnTime;
             });
 
-            // Build message
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
             for (const t of timers) {
                 if (!t.respawnTime) {
-                    msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — NIL\n`;
+                    msg += `• cc${t.channelChoice} — NIL\n`;
                 } else {
                     const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                    msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                    msg += `• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
                 }
             }
 
