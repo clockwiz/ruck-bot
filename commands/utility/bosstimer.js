@@ -298,6 +298,7 @@ module.exports = {
             const timers = [];
 
             if (boss === 'AHMA') {
+                // Ah Ma — no location
                 for (const channelChoice of channels) {
                     const key = `${boss}-${channelChoice}`;
                     if (bossTimers.has(key)) {
@@ -307,6 +308,7 @@ module.exports = {
                     }
                 }
             } else {
+                // BF and HH — include locations
                 for (const loc of bossLocations[boss]) {
                     const locationInput = loc.input;
                     const locationDisplay = loc.display;
@@ -329,9 +331,10 @@ module.exports = {
             });
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
+
             for (const t of timers) {
                 if (boss === 'AHMA') {
-                    // Ah Ma – no location
+                    // Ah Ma — no location
                     if (!t.respawnTime) {
                         msg += `• cc${t.channelChoice} — NIL\n`;
                     } else {
@@ -339,12 +342,12 @@ module.exports = {
                         msg += `• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
                     }
                 } else {
-                    // BF / HH – include location
+                    // BF / HH — location first, bolded
                     if (!t.respawnTime) {
-                        msg += `• cc${t.channelChoice} — ${t.locationDisplay} — NIL\n`;
+                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — NIL\n`;
                     } else {
                         const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                        msg += `• cc${t.channelChoice} — ${t.locationDisplay} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
                     }
                 }
             }
@@ -352,6 +355,7 @@ module.exports = {
             if (msg.length > 2000) msg = msg.substring(0, 1990) + '\n...';
             await interaction.followUp(msg);
         }
+
     },
 
     init(client) {
