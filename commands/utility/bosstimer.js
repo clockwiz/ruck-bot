@@ -330,11 +330,22 @@ module.exports = {
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
             for (const t of timers) {
-                if (!t.respawnTime) {
-                    msg += `• cc${t.channelChoice} — NIL\n`;
+                if (boss === 'AHMA') {
+                    // Ah Ma – no location
+                    if (!t.respawnTime) {
+                        msg += `• cc${t.channelChoice} — NIL\n`;
+                    } else {
+                        const ts = Math.floor(t.respawnTime.getTime() / 1000);
+                        msg += `• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                    }
                 } else {
-                    const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                    msg += `• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                    // BF / HH – include location
+                    if (!t.respawnTime) {
+                        msg += `• cc${t.channelChoice} — ${t.locationDisplay} — NIL\n`;
+                    } else {
+                        const ts = Math.floor(t.respawnTime.getTime() / 1000);
+                        msg += `• cc${t.channelChoice} — ${t.locationDisplay} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                    }
                 }
             }
 
