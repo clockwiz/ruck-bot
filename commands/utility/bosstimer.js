@@ -325,11 +325,21 @@ module.exports = {
 
             const now = new Date();
             timers.sort((a, b) => {
-                // NILs first
+                const now = new Date();
+
+                // 1️⃣ NILs first
                 if (!a.respawnTime && b.respawnTime) return -1;
                 if (a.respawnTime && !b.respawnTime) return 1;
                 if (!a.respawnTime && !b.respawnTime) return 0;
-                // Then sort ascending
+
+                // 2️⃣ Separate future and past
+                const aFuture = a.respawnTime > now;
+                const bFuture = b.respawnTime > now;
+
+                if (aFuture && !bFuture) return -1; // future before past
+                if (!aFuture && bFuture) return 1;  // past after future
+
+                // 3️⃣ Within each group, sort ascending (soonest → latest)
                 return a.respawnTime - b.respawnTime;
             });
 
