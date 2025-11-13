@@ -338,7 +338,7 @@ module.exports = {
             timers.sort((a, b) => {
                 const now = new Date();
 
-                // 1) NILs first
+                // 1️⃣ NILs first
                 if (!a.respawnTime && b.respawnTime) return -1;
                 if (a.respawnTime && !b.respawnTime) return 1;
                 if (!a.respawnTime && !b.respawnTime) return 0;
@@ -346,20 +346,18 @@ module.exports = {
                 const aFuture = a.respawnTime > now;
                 const bFuture = b.respawnTime > now;
 
-                // 2) Future group comes BEFORE past group
+                // 2️⃣ Future timers before past timers
                 if (aFuture && !bFuture) return -1;
                 if (!aFuture && bFuture) return 1;
 
-                // 3) Within groups:
-                //    - Future: sort ascending by time (soonest -> latest)
-                //    - Past: sort descending by time (most recent -> oldest)
-                if (aFuture && bFuture) return a.respawnTime - b.respawnTime;
+                // 3️⃣ Within each group:
+                //     - Future: sort descending (latest → soonest)
+                //     - Past: sort descending (most recent → oldest)
+                if (aFuture && bFuture) return b.respawnTime - a.respawnTime;
                 if (!aFuture && !bFuture) return b.respawnTime - a.respawnTime;
 
                 return 0;
             });
-
-
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
 
