@@ -324,6 +324,17 @@ module.exports = {
             }
 
             const now = new Date();
+
+            // Convert any Big Foot timers older than 24h ago into NIL
+            if (boss === 'BF') {
+                const now = new Date();
+                for (const t of timers) {
+                    if (t.respawnTime && (now - t.respawnTime) > 24 * 60 * 60 * 1000) {
+                        t.respawnTime = null;
+                    }
+                }
+            }
+
             timers.sort((a, b) => {
                 const now = new Date();
 
@@ -332,16 +343,21 @@ module.exports = {
                 if (a.respawnTime && !b.respawnTime) return 1;
                 if (!a.respawnTime && !b.respawnTime) return 0;
 
-                // 2️⃣ Separate future and past
+                // 2️⃣ Separate past and future (past first)
                 const aFuture = a.respawnTime > now;
                 const bFuture = b.respawnTime > now;
 
-                if (aFuture && !bFuture) return -1; // future before past
-                if (!aFuture && bFuture) return 1;  // past after future
+                if (aFuture && !bFuture) return 1;  // future goes after past
+                if (!aFuture && bFuture) return -1; // past goes before future
 
-                // 3️⃣ Within each group, sort ascending (soonest → latest)
-                return a.respawnTime - b.respawnTime;
+                // 3️⃣ Within each group, sort descending for past (newest → oldest)
+                //     and ascending for future (soonest → latest)
+                if (!aFuture && !bFuture) return b.respawnTime - a.respawnTime; // both past
+                if (aFuture && bFuture) return a.respawnTime - b.respawnTime;   // both future
+
+                return 0;
             });
+
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
 
