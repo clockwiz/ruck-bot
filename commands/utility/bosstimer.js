@@ -376,7 +376,7 @@ module.exports = {
                         msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — NIL\n`;
                     } else {
                         const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — <t:${ts}:t> (<t:${ts}:R>)\n`;
                     }
                 }
             }
