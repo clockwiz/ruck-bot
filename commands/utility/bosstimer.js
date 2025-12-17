@@ -361,25 +361,42 @@ module.exports = {
 
             let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
 
+            // ===== BUILD LINES INSTEAD OF ONE BIG MESSAGE =====
+            const lines = [];
+            lines.push(`⏰ **Current ${bossDisplay} Timers:**`);
+
             for (const t of timers) {
                 if (boss === 'AHMA') {
-                    // Ah Ma — no location
                     if (!t.respawnTime) {
-                        msg += `• cc${t.channelChoice} — NIL\n`;
+                        lines.push(`• cc${t.channelChoice} — NIL`);
                     } else {
                         const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                        msg += `• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)\n`;
+                        lines.push(`• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)`);
                     }
                 } else {
-                    // BF / HH — location first, bolded
+                    // BF / HH
                     if (!t.respawnTime) {
-                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — NIL\n`;
+                        lines.push(`• **${t.locationDisplay}** — cc${t.channelChoice} — NIL`);
                     } else {
                         const ts = Math.floor(t.respawnTime.getTime() / 1000);
-                        msg += `• **${t.locationDisplay}** — cc${t.channelChoice} — <t:${ts}:t> (<t:${ts}:R>)\n`;
+                        lines.push(`• **${t.locationDisplay}** — cc${t.channelChoice} — <t:${ts}:t> (<t:${ts}:R>)`);
                     }
                 }
             }
+
+            // ===== SPLIT INTO 2 MESSAGES (BF ONLY) =====
+            if (boss === 'BF') {
+                const midpoint = Math.ceil(lines.length / 2);
+                const firstMsg = lines.slice(0, midpoint).join('\n');
+                const secondMsg = lines.slice(midpoint).join('\n');
+
+                await interaction.followUp(firstMsg);
+                await interaction.followUp(secondMsg);
+            } else {
+                // HH / AHMA stay as single message
+                await interaction.followUp(lines.join('\n'));
+            }
+
 
             if (msg.length > 2000) msg = msg.substring(0, 1990) + '\n...';
             await interaction.followUp(msg);
