@@ -359,8 +359,6 @@ module.exports = {
                 return 0;
             });
 
-            let msg = `⏰ **Current ${bossDisplay} Timers:**\n`;
-
             // ===== BUILD LINES INSTEAD OF ONE BIG MESSAGE =====
             const lines = [];
             lines.push(`⏰ **Current ${bossDisplay} Timers:**`);
@@ -396,10 +394,6 @@ module.exports = {
                 // HH / AHMA stay as single message
                 await interaction.followUp(lines.join('\n'));
             }
-
-
-            if (msg.length > 2000) msg = msg.substring(0, 1990) + '\n...';
-            await interaction.followUp(msg);
         }
 
     },
