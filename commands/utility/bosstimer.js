@@ -151,6 +151,62 @@ module.exports = {
                 )
         )
 
+        // ADD PIANUS
+        .addSubcommand(sub =>
+            sub
+                .setName('add-pianus')
+                .setDescription('Add a Pianus timer.')
+                .addStringOption(opt =>
+                    opt.setName('channel')
+                        .setDescription('Select which channel (1-4)')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1', value: '1' },
+                            { name: '2', value: '2' },
+                            { name: '3', value: '3' },
+                            { name: '4', value: '4' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt.setName('side')
+                        .setDescription('Left or Right Pianus')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: 'Left', value: 'LEFT' },
+                            { name: 'Right', value: 'RIGHT' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt.setName('datetime')
+                        .setDescription('Optional: Specify date/time as MM/DD HH:MM')
+                        .setRequired(false)
+                )
+        )
+
+        //ADD MANON
+        .addSubcommand(sub =>
+            sub
+                .setName('add-manon')
+                .setDescription('Add a Manon timer.')
+                .addStringOption(opt =>
+                    opt.setName('channel')
+                        .setDescription('Select which channel (1-4)')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1', value: '1' },
+                            { name: '2', value: '2' },
+                            { name: '3', value: '3' },
+                            { name: '4', value: '4' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt.setName('datetime')
+                        .setDescription('Optional: Specify date/time as MM/DD HH:MM')
+                        .setRequired(false)
+                )
+        )
+
+
         // 🗑 DELETE
         .addSubcommand(sub =>
             sub
@@ -161,7 +217,9 @@ module.exports = {
                         .addChoices(
                             { name: 'Big Foot', value: 'BF' },
                             { name: 'Headless Horseman', value: 'HH' },
-                            { name: 'Ah Ma', value: 'AHMA' }
+                            { name: 'Ah Ma', value: 'AHMA' },
+                            { name: 'Pianus', value: 'PIANUS' },
+                            { name: 'Manon', value: 'MANON' }
                         )
                 )
                 .addStringOption(opt =>
@@ -197,7 +255,9 @@ module.exports = {
                         .addChoices(
                             { name: 'Big Foot', value: 'BF' },
                             { name: 'Headless Horseman', value: 'HH' },
-                            { name: 'Ah Ma', value: 'AHMA' }
+                            { name: 'Ah Ma', value: 'AHMA' },
+                            { name: 'Pianus', value: 'PIANUS' },
+                            { name: 'Manon', value: 'MANON' }
                         )
                 )
         ),
@@ -276,12 +336,81 @@ module.exports = {
             await interaction.reply(`✅ Ah Ma timer set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`);
         }
 
+        // ADD-PIANUS
+        else if (sub === 'add-pianus') {
+            const boss = 'PIANUS';
+            const channelChoice = interaction.options.getString('channel');
+            const side = interaction.options.getString('side');
+            let now = new Date();
+
+            const timeInput = interaction.options.getString('datetime');
+            if (timeInput) {
+                const [datePart, timePart] = timeInput.split(' ');
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            const respawn = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+            const key = `${boss}-${channelChoice}-${side}`;
+
+            bossTimers.set(key, { boss, channelChoice, side, respawnTime: respawn });
+            saveTimers();
+
+            await interaction.reply(
+                `✅ Pianus (${side}) set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
+            );
+        }
+
+        // ADD-MANON
+        else if (sub === 'add-manon') {
+            const boss = 'MANON';
+            const channelChoice = interaction.options.getString('channel');
+            let now = new Date();
+
+            const timeInput = interaction.options.getString('datetime');
+            if (timeInput) {
+                const [datePart, timePart] = timeInput.split(' ');
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            const respawn = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            const key = `${boss}-${channelChoice}`;
+
+            bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
+            saveTimers();
+
+            await interaction.reply(
+                `✅ Manon set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
+            );
+        }
+
+
         // DELETE
         else if (sub === 'delete') {
             const boss = interaction.options.getString('boss');
             const channelChoice = interaction.options.getString('channel');
             const location = interaction.options.getString('location');
-            const key = boss === 'AHMA' ? `${boss}-${channelChoice}` : `${boss}-${channelChoice}-${location}`;
+            let key;
+
+                if (boss === 'AHMA' || boss === 'MANON') {
+                    key = `${boss}-${channelChoice}`;
+                }
+                else if (boss === 'PIANUS') {
+                    if (!location)
+                        return interaction.reply('⚠️ Pianus requires LEFT or RIGHT.');
+
+                    key = `${boss}-${channelChoice}-${location}`;
+                }
+                else {
+                    // BF / HH
+                    key = `${boss}-${channelChoice}-${location}`;
+                }
+
             if (!bossTimers.has(key))
                 return interaction.reply(`⚠️ No timer found for **${boss}** in cc${channelChoice}${location ? ` at ${location}` : ''}.`);
             bossTimers.delete(key);
@@ -293,12 +422,17 @@ module.exports = {
         else if (sub === 'list') {
             await interaction.deferReply();
             const boss = interaction.options.getString('boss');
-            const bossDisplay = boss === 'BF' ? 'Big Foot' : boss === 'HH' ? 'Headless Horseman' : 'Ah Ma';
+            const bossDisplay =
+                boss === 'BF' ? 'Big Foot' :
+                boss === 'HH' ? 'Headless Horseman' :
+                boss === 'PIANUS' ? 'Pianus' :
+                boss === 'MANON' ? 'Manon' :
+                'Ah Ma';
             const channels = ['1', '2', '3', '4'];
             const timers = [];
 
-            if (boss === 'AHMA') {
-                // Ah Ma — no location
+            if (boss === 'AHMA' || boss === 'MANON') {
+                // Ah Ma / Manon — no location
                 for (const channelChoice of channels) {
                     const key = `${boss}-${channelChoice}`;
                     if (bossTimers.has(key)) {
@@ -307,7 +441,22 @@ module.exports = {
                         timers.push({ channelChoice, respawnTime: null });
                     }
                 }
-            } else {
+            } 
+            
+            else if (boss === 'PIANUS') {
+                for (const side of ['LEFT', 'RIGHT']) {
+                    for (const channelChoice of channels) {
+                        const key = `${boss}-${channelChoice}-${side}`;
+                        if (bossTimers.has(key)) {
+                            timers.push({ channelChoice, side, respawnTime: bossTimers.get(key).respawnTime });
+                        } else {
+                            timers.push({ channelChoice, side, respawnTime: null });
+                        }
+                    }
+                }
+            }
+            
+            else {
                 // BF and HH — include locations
                 for (const loc of bossLocations[boss]) {
                     const locationInput = loc.input;
@@ -364,15 +513,29 @@ module.exports = {
             lines.push(`⏰ **Current ${bossDisplay} Timers:**`);
 
             for (const t of timers) {
-                if (boss === 'AHMA') {
+
+                // AHMA + MANON
+                if (boss === 'AHMA' || boss === 'MANON') {
                     if (!t.respawnTime) {
                         lines.push(`• cc${t.channelChoice} — NIL`);
                     } else {
                         const ts = Math.floor(t.respawnTime.getTime() / 1000);
                         lines.push(`• cc${t.channelChoice} — spawns <t:${ts}:t> (<t:${ts}:R>)`);
                     }
-                } else {
-                    // BF / HH
+                }
+
+                // PIANUS
+                else if (boss === 'PIANUS') {
+                    if (!t.respawnTime) {
+                        lines.push(`• cc${t.channelChoice} — ${t.side} — NIL`);
+                    } else {
+                        const ts = Math.floor(t.respawnTime.getTime() / 1000);
+                        lines.push(`• cc${t.channelChoice} — ${t.side} — <t:${ts}:t> (<t:${ts}:R>)`);
+                    }
+                }
+
+                // BF / HH
+                else {
                     if (!t.respawnTime) {
                         lines.push(`• **${t.locationDisplay}** — cc${t.channelChoice} — NIL`);
                     } else {
@@ -381,6 +544,7 @@ module.exports = {
                     }
                 }
             }
+
 
             // ===== SPLIT INTO 2 MESSAGES (BF ONLY) =====
             if (boss === 'BF') {
