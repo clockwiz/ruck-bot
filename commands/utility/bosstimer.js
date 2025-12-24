@@ -490,7 +490,7 @@ module.exports = {
             const channels = ['1', '2', '3', '4'];
             const timers = [];
 
-            if (boss === 'AHMA' || boss === 'MANON') {
+            if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
                 // Ah Ma / Manon — no location
                 for (const channelChoice of channels) {
                     const key = `${boss}-${channelChoice}`;
@@ -574,7 +574,7 @@ module.exports = {
             for (const t of timers) {
 
                 // AHMA + MANON
-                if (boss === 'AHMA' || boss === 'MANON') {
+                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
                     if (!t.respawnTime) {
                         lines.push(`• cc${t.channelChoice} — NIL`);
                     } else {
@@ -606,17 +606,22 @@ module.exports = {
 
 
             // ===== SPLIT INTO 2 MESSAGES (BF ONLY) =====
+            // ===== SEND RESPONSE (FIXED) =====
             if (boss === 'BF') {
                 const midpoint = Math.ceil(lines.length / 2);
                 const firstMsg = lines.slice(0, midpoint).join('\n');
                 const secondMsg = lines.slice(midpoint).join('\n');
 
-                await interaction.followUp(firstMsg);
+                // finalize the deferred reply
+                await interaction.editReply(firstMsg);
+
+                // extra message
                 await interaction.followUp(secondMsg);
             } else {
-                // HH / AHMA stay as single message
-                await interaction.followUp(lines.join('\n'));
+                // finalize the deferred reply (ALL other bosses)
+                await interaction.editReply(lines.join('\n'));
             }
+
         }
 
     },
