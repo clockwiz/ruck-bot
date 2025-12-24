@@ -206,6 +206,32 @@ module.exports = {
                 )
         )
 
+        // 🐉 ADD-LEVIATHAN
+        .addSubcommand(sub =>
+            sub
+                .setName('add-leviathan')
+                .setDescription('Add a Leviathan timer.')
+                .addStringOption(opt =>
+                    opt
+                        .setName('channel')
+                        .setDescription('Select which channel (1-4)')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1', value: '1' },
+                            { name: '2', value: '2' },
+                            { name: '3', value: '3' },
+                            { name: '4', value: '4' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt
+                        .setName('datetime')
+                        .setDescription('Optional: Specify date/time as MM/DD HH:MM')
+                        .setRequired(false)
+                )
+        )
+
+
 
         // 🗑 DELETE
         .addSubcommand(sub =>
@@ -219,7 +245,8 @@ module.exports = {
                             { name: 'Headless Horseman', value: 'HH' },
                             { name: 'Ah Ma', value: 'AHMA' },
                             { name: 'Pianus', value: 'PIANUS' },
-                            { name: 'Manon', value: 'MANON' }
+                            { name: 'Manon', value: 'MANON' },
+                            { name: 'Leviathan', value: 'LEVIATHAN' }
                         )
                 )
                 .addStringOption(opt =>
@@ -257,7 +284,8 @@ module.exports = {
                             { name: 'Headless Horseman', value: 'HH' },
                             { name: 'Ah Ma', value: 'AHMA' },
                             { name: 'Pianus', value: 'PIANUS' },
-                            { name: 'Manon', value: 'MANON' }
+                            { name: 'Manon', value: 'MANON' },
+                            { name: 'Leviathan', value: 'LEVIATHAN' }
                         )
                 )
         ),
@@ -389,6 +417,34 @@ module.exports = {
             );
         }
 
+        // ADD-LEVIATHAN
+        else if (sub === 'add-leviathan') {
+            const boss = 'LEVIATHAN';
+            const channelChoice = interaction.options.getString('channel');
+            let now = new Date();
+
+            const timeInput = interaction.options.getString('datetime');
+            if (timeInput) {
+                const [datePart, timePart] = timeInput.split(' ');
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            // 2 hour respawn
+            const respawn = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            const key = `${boss}-${channelChoice}`;
+
+            bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
+            saveTimers();
+
+            await interaction.reply(
+                `✅ Leviathan set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
+            );
+        }
+
+
 
         // DELETE
         else if (sub === 'delete') {
@@ -397,9 +453,10 @@ module.exports = {
             const location = interaction.options.getString('location');
             let key;
 
-                if (boss === 'AHMA' || boss === 'MANON') {
+                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
                     key = `${boss}-${channelChoice}`;
                 }
+
                 else if (boss === 'PIANUS') {
                     if (!location)
                         return interaction.reply('⚠️ Pianus requires LEFT or RIGHT.');
@@ -427,7 +484,9 @@ module.exports = {
                 boss === 'HH' ? 'Headless Horseman' :
                 boss === 'PIANUS' ? 'Pianus' :
                 boss === 'MANON' ? 'Manon' :
+                boss === 'LEVIATHAN' ? 'Leviathan' :
                 'Ah Ma';
+
             const channels = ['1', '2', '3', '4'];
             const timers = [];
 
