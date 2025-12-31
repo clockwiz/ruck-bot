@@ -356,7 +356,7 @@ module.exports = {
                 now = new Date(year, month - 1, day, hours, minutes);
             }
 
-            const respawn = new Date(now.getTime() + 5.5 * 60 * 60 * 1000); // 6 hours
+            const respawn = new Date(now.getTime() + 4.5 * 60 * 60 * 1000); // 6 hours
             const key = `${boss}-${channelChoice}`;
             bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
             saveTimers();
