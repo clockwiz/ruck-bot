@@ -406,7 +406,7 @@ module.exports = {
                 now = new Date(year, month - 1, day, hours, minutes);
             }
 
-            const respawn = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+            const respawn = new Date(now.getTime() + 3 * 60 * 60 * 1000);
             const key = `${boss}-${channelChoice}`;
 
             bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
