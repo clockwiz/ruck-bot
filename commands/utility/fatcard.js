@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('card2')
+        .setName('fatcard')
         .setDescription('Draws a random card from a standard 52-card deck.'),
     async execute(interaction) {
 
@@ -37,7 +37,6 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle('🃏 You drew a card')
-            .setDescription(`**${cardName}**`)
             .setImage(imageUrl);
 
         await interaction.reply({ embeds: [embed] });
