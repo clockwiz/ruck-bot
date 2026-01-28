@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('card')
+        .setName('card2')
         .setDescription('Draws a random card from a standard 52-card deck.'),
     async execute(interaction) {
 
