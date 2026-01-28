@@ -22,8 +22,9 @@ for (const folder of commandFolders) {
       continue;
     }
 
-    // 👇 THIS is the only logic change
-    if (command.data.name === 'bosstimer') {
+  const guildOnlyCommands = ['bosstimer', 'fatcard', 'fatcardhidden'];
+
+    if (guildOnlyCommands.includes(command.data.name)) {
       bossTimerCommands.push(command.data.toJSON());
     } else {
       normalCommands.push(command.data.toJSON());
