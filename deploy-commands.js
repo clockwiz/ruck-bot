@@ -22,7 +22,7 @@ for (const folder of commandFolders) {
       continue;
     }
 
-  const guildOnlyCommands = ['bosstimer', 'fatcard', 'fatcardhidden'];
+  const guildOnlyCommands = ['bosstimer'];
 
     if (guildOnlyCommands.includes(command.data.name)) {
       bossTimerCommands.push(command.data.toJSON());
