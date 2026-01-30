@@ -231,6 +231,31 @@ module.exports = {
                 )
         )
 
+        // 🐙 ADD-CRAYZ
+        .addSubcommand(sub =>
+            sub
+                .setName('add-crayz')
+                .setDescription('Add a Crayz timer.')
+                .addStringOption(opt =>
+                    opt
+                        .setName('channel')
+                        .setDescription('Select which channel (1-4)')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: '1', value: '1' },
+                            { name: '2', value: '2' },
+                            { name: '3', value: '3' },
+                            { name: '4', value: '4' }
+                        )
+                )
+                .addStringOption(opt =>
+                    opt
+                        .setName('datetime')
+                        .setDescription('Optional: Specify date/time as MM/DD HH:MM')
+                        .setRequired(false)
+                )
+        )
+
 
 
         // 🗑 DELETE
@@ -246,7 +271,8 @@ module.exports = {
                             { name: 'Ah Ma', value: 'AHMA' },
                             { name: 'Pianus', value: 'PIANUS' },
                             { name: 'Manon', value: 'MANON' },
-                            { name: 'Leviathan', value: 'LEVIATHAN' }
+                            { name: 'Leviathan', value: 'LEVIATHAN' },
+                            { name: 'Crayz', value: 'CRAYZ' }
                         )
                 )
                 .addStringOption(opt =>
@@ -285,7 +311,8 @@ module.exports = {
                             { name: 'Ah Ma', value: 'AHMA' },
                             { name: 'Pianus', value: 'PIANUS' },
                             { name: 'Manon', value: 'MANON' },
-                            { name: 'Leviathan', value: 'LEVIATHAN' }
+                            { name: 'Leviathan', value: 'LEVIATHAN' },
+                            { name: 'Crayz', value: 'CRAYZ' }
                         )
                 )
         ),
@@ -444,6 +471,32 @@ module.exports = {
             );
         }
 
+        // ADD-CRAYZ
+        else if (sub === 'add-crayz') {
+            const boss = 'CRAYZ';
+            const channelChoice = interaction.options.getString('channel');
+            let now = new Date();
+
+            const timeInput = interaction.options.getString('datetime');
+            if (timeInput) {
+                const [datePart, timePart] = timeInput.split(' ');
+                const [month, day] = datePart.split('/').map(Number);
+                const [hours, minutes] = timePart.split(':').map(Number);
+                const year = new Date().getFullYear();
+                now = new Date(year, month - 1, day, hours, minutes);
+            }
+
+            // 6 hour respawn
+            const respawn = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+            const key = `${boss}-${channelChoice}`;
+
+            bossTimers.set(key, { boss, channelChoice, respawnTime: respawn });
+            saveTimers();
+
+            await interaction.reply(
+                `✅ Crayz set in cc${channelChoice} — respawns <t:${Math.floor(respawn.getTime()/1000)}:t> (<t:${Math.floor(respawn.getTime()/1000)}:R>)`
+            );
+        }
 
 
         // DELETE
@@ -453,7 +506,7 @@ module.exports = {
             const location = interaction.options.getString('location');
             let key;
 
-                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
+                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN' || boss === 'CRAYZ') {
                     key = `${boss}-${channelChoice}`;
                 }
 
@@ -485,12 +538,13 @@ module.exports = {
                 boss === 'PIANUS' ? 'Pianus' :
                 boss === 'MANON' ? 'Manon' :
                 boss === 'LEVIATHAN' ? 'Leviathan' :
+                boss === 'CRAYZ' ? 'Cray-Z'
                 'Ah Ma';
 
             const channels = ['1', '2', '3', '4'];
             const timers = [];
 
-            if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
+            if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN' || boss === 'CRAYZ') {
                 // Ah Ma / Manon — no location
                 for (const channelChoice of channels) {
                     const key = `${boss}-${channelChoice}`;
