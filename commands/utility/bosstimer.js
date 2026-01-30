@@ -538,7 +538,7 @@ module.exports = {
                 boss === 'PIANUS' ? 'Pianus' :
                 boss === 'MANON' ? 'Manon' :
                 boss === 'LEVIATHAN' ? 'Leviathan' :
-                boss === 'CRAYZ' ? 'Cray-Z'
+                boss === 'CRAYZ' ? 'Cray-Z' :
                 'Ah Ma';
 
             const channels = ['1', '2', '3', '4'];
@@ -628,7 +628,7 @@ module.exports = {
             for (const t of timers) {
 
                 // AHMA + MANON
-                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN') {
+                if (boss === 'AHMA' || boss === 'MANON' || boss === 'LEVIATHAN' || boss === 'CRAYZ') {
                     if (!t.respawnTime) {
                         lines.push(`• cc${t.channelChoice} — NIL`);
                     } else {
