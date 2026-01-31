@@ -37,7 +37,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setTitle('🃏 You drew a card')
-            .setImage(imageUrl);
+            .setThumbnail(imageUrl);
 
         await interaction.reply({ embeds: [embed] });
     },
