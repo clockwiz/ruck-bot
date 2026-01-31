@@ -36,7 +36,6 @@ module.exports = {
         const imageUrl = `https://deckofcardsapi.com/static/img/${rank.code}${suit.code}.png`;
 
         const embed = new EmbedBuilder()
-            .setTitle('🃏 You drew a card')
             .setImage(imageUrl);
 
         await interaction.reply({ embeds: [embed] });
